@@ -1,6 +1,10 @@
 import pytest
 from selenium import  webdriver
-
+from utilities.XLUtils import  read_excel_data
+import configparser
+import os
+config = configparser.RawConfigParser()
+file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "TestData", "logintestdata.xlsx")
 
 @pytest.fixture
 def setup(browser):
@@ -39,3 +43,16 @@ def pytest_metadata(config):
         config.metadata.pop("JAVA_HOME", None)
         config.metadata.pop("Plugins",None)
 
+
+
+def pytest_generate_tests(metafunc):
+    # For login test
+    if {"username", "password"} <= set(metafunc.fixturenames):
+        # data = read_excel_data(".TestData/logintestdata.xlsx", "Sheet2")
+        data = read_excel_data(file_path, "Sheet2")
+        metafunc.parametrize(("username", "password"), data)
+
+    # # For add data test
+    # if {"firstname", "lastname", "email"} <= set(metafunc.fixturenames):
+    #     data = read_excel_data("testdata/adddata.xlsx", "Sheet2")
+    #     metafunc.parametrize(("firstname", "lastname", "email"), data)
